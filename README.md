@@ -18,6 +18,8 @@ Bu proje, Fragment/XML kullanan bir Android uygulamada Compose'a kontrollu gecis
 State asagi akar: `Repository -> UseCase -> ViewModel -> UiState -> Fragment/Route -> Screen`.
 Event yukari cikar: `Screen/XML click -> callback -> Fragment/Route -> ViewModel veya Fragment Navigation`.
 
+Fragment/XML + Compose migration semasinin bu codebase'deki karsiligi icin: [Codebase Mapping](docs/fragment-compose-codebase-mapping.md).
+
 ## Mock Veri
 
 Gercek backend yoktur. `app/src/main/assets/banking_mock.json` dosyasi backend payload'u gibi okunur, Kotlin Serialization ile DTO'ya parse edilir ve mapper ile domain modele cevrilir.
