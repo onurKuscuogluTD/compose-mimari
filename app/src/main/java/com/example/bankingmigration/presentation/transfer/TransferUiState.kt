@@ -1,5 +1,7 @@
 package com.example.bankingmigration.presentation.transfer
 
+import com.example.bankingmigration.core.mvi.MviState
+
 data class TransferUiState(
     val isLoading: Boolean = true,
     val accounts: List<TransferAccountUiModel> = emptyList(),
@@ -10,7 +12,7 @@ data class TransferUiState(
     val statusMessage: String = "Transfer bilgileri hazirlaniyor.",
     val errorMessage: String? = null,
     val isSubmitting: Boolean = false,
-) {
+) : MviState {
     val canSubmit: Boolean
         get() = !isLoading &&
             !isSubmitting &&

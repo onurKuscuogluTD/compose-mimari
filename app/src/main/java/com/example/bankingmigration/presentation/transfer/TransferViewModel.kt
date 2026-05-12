@@ -1,16 +1,12 @@
 package com.example.bankingmigration.presentation.transfer
 
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.bankingmigration.core.format.MoneyFormatter
+import com.example.bankingmigration.core.mvi.BaseMviViewModel
 import com.example.bankingmigration.domain.model.TransferRequest
 import com.example.bankingmigration.domain.usecase.GetTransferInitialDataUseCase
 import com.example.bankingmigration.domain.usecase.SubmitTransferUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -19,39 +15,34 @@ class TransferViewModel @Inject constructor(
     private val getTransferInitialData: GetTransferInitialDataUseCase,
     private val submitTransfer: SubmitTransferUseCase,
     private val moneyFormatter: MoneyFormatter,
-) : ViewModel() {
-
-    private val _uiState = MutableStateFlow(TransferUiState())
-    val uiState: StateFlow<TransferUiState> = _uiState.asStateFlow()
+) : BaseMviViewModel<TransferIntent, TransferUiState, TransferEffect>(TransferUiState()) {
 
     init {
-        load()
+        onIntent(TransferIntent.Load)
     }
 
-    fun retry() {
-        load()
-    }
-
-    fun selectAccount(accountId: String) {
-        _uiState.update { current ->
-            current.withSelectedAccount(accountId)
+    override fun onIntent(intent: TransferIntent) {
+        when (intent) {
+            TransferIntent.Load, TransferIntent.RetryClicked -> load()
+            TransferIntent.BackClicked -> emitEffect(TransferEffect.NavigateBack)
+            is TransferIntent.AccountSelected -> reduce {
+                withSelectedAccount(intent.accountId)
+            }
+            is TransferIntent.RecipientSelected -> reduce {
+                withSelectedRecipient(intent.recipientId)
+            }
+            TransferIntent.SubmitClicked -> submit()
         }
     }
 
-    fun selectRecipient(recipientId: String) {
-        _uiState.update { current ->
-            current.withSelectedRecipient(recipientId)
-        }
-    }
-
-    fun submit() {
-        val current = _uiState.value
+    private fun submit() {
+        val current = currentState
         val sourceAccountId = current.selectedAccountId ?: return
         val recipientId = current.selectedRecipientId ?: return
 
         viewModelScope.launch {
-            _uiState.update {
-                it.copy(
+            reduce {
+                copy(
                     isSubmitting = true,
                     errorMessage = null,
                     statusMessage = "Transfer talebi gonderiliyor.",
@@ -67,16 +58,16 @@ class TransferViewModel @Inject constructor(
                 )
             }
                 .onSuccess { receipt ->
-                    _uiState.update {
-                        it.copy(
+                    reduce {
+                        copy(
                             isSubmitting = false,
                             statusMessage = receipt.statusMessage,
                         )
                     }
                 }
                 .onFailure { error ->
-                    _uiState.update {
-                        it.copy(
+                    reduce {
+                        copy(
                             isSubmitting = false,
                             errorMessage = error.message ?: "Transfer talebi tamamlanamadi.",
                             statusMessage = "Transfer tekrar denenebilir.",
@@ -88,8 +79,8 @@ class TransferViewModel @Inject constructor(
 
     private fun load() {
         viewModelScope.launch {
-            _uiState.update {
-                it.copy(
+            reduce {
+                copy(
                     isLoading = true,
                     errorMessage = null,
                     statusMessage = "Transfer bilgileri hazirlaniyor.",
@@ -97,11 +88,11 @@ class TransferViewModel @Inject constructor(
             }
             runCatching { getTransferInitialData() }
                 .onSuccess { initialData ->
-                    _uiState.value = initialData.toTransferUiState(moneyFormatter)
+                    reduce { initialData.toTransferUiState(moneyFormatter) }
                 }
                 .onFailure { error ->
-                    _uiState.update {
-                        it.copy(
+                    reduce {
+                        copy(
                             isLoading = false,
                             errorMessage = error.message ?: "Transfer bilgileri yuklenemedi.",
                             statusMessage = "Transfer bilgileri yuklenemedi.",

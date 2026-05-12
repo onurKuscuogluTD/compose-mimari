@@ -1,6 +1,6 @@
-# Banking Compose Migration Sample
+# Banking Compose Migration Sample - MVI
 
-Bu proje, Fragment/XML kullanan bir Android uygulamada Compose'a kontrollu gecisi gosteren ornek bir bankacilik uygulamasidir. Odak UI gorselliginden cok MVVM + Clean Architecture + UDF, Fragment Navigation ve View/Compose birlikte yasama sinirlaridir.
+Bu proje, Fragment/XML kullanan bir Android uygulamada Compose'a kontrollu gecisi gosteren ornek bir bankacilik uygulamasidir. Odak UI gorselliginden cok MVI + Clean Architecture + UDF, Fragment Navigation ve View/Compose birlikte yasama sinirlaridir.
 
 ## Ekranlar
 
@@ -16,7 +16,8 @@ Bu proje, Fragment/XML kullanan bir Android uygulamada Compose'a kontrollu gecis
 - `di`: Hilt module binding ve provider tanimlari.
 
 State asagi akar: `Repository -> UseCase -> ViewModel -> UiState -> Fragment/Route -> Screen`.
-Event yukari cikar: `Screen/XML click -> callback -> Fragment/Route -> ViewModel veya Fragment Navigation`.
+Event yukari cikar: `Screen/XML click -> Intent -> ViewModel -> reducer -> UiState`.
+One-off event'ler `Effect -> Fragment/Route -> Fragment Navigation` seklinde tuketilir.
 
 Fragment/XML + Compose migration semasinin bu codebase'deki karsiligi icin: [Codebase Mapping](docs/fragment-compose-codebase-mapping.md).
 
@@ -32,13 +33,11 @@ Gercek backend yoktur. `app/src/main/assets/banking_mock.json` dosyasi backend p
 ./gradlew lintDebug
 ```
 
-## GitHub
+## Branch
 
-`local.properties`, Gradle cache ve build ciktilari `.gitignore` icinde tutulur. Ilk commit icin onerilen mesaj:
+Bu branch, ayni migration senaryosunu MVI presentation modeliyle gostermek icin `MVVM` branch'inden ayrilir. `local.properties`, Gradle cache ve build ciktilari `.gitignore` icinde tutulur.
 
-```text
-Initial MVVM clean architecture Compose interop banking sample
-```
+MVVM karsilastirmasi icin `MVVM` branch'i, MVI uygulamasi icin `MVI` branch'i kullanilir.
 
 ## Notlar
 

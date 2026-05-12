@@ -1,14 +1,10 @@
 package com.example.bankingmigration.presentation.accounts
 
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.bankingmigration.core.format.MoneyFormatter
+import com.example.bankingmigration.core.mvi.BaseMviViewModel
 import com.example.bankingmigration.domain.usecase.GetAccountsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -16,29 +12,30 @@ import javax.inject.Inject
 class AccountsViewModel @Inject constructor(
     private val getAccounts: GetAccountsUseCase,
     private val moneyFormatter: MoneyFormatter,
-) : ViewModel() {
-
-    private val _uiState = MutableStateFlow(AccountsUiState())
-    val uiState: StateFlow<AccountsUiState> = _uiState.asStateFlow()
+) : BaseMviViewModel<AccountsIntent, AccountsUiState, AccountsEffect>(AccountsUiState()) {
 
     init {
-        loadAccounts()
+        onIntent(AccountsIntent.Load)
     }
 
-    fun retry() {
-        loadAccounts()
+    override fun onIntent(intent: AccountsIntent) {
+        when (intent) {
+            AccountsIntent.Load, AccountsIntent.RetryClicked -> loadAccounts()
+            AccountsIntent.BackClicked -> emitEffect(AccountsEffect.NavigateBack)
+            AccountsIntent.TransferClicked -> emitEffect(AccountsEffect.NavigateToTransfer)
+        }
     }
 
     private fun loadAccounts() {
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true, errorMessage = null) }
+            reduce { copy(isLoading = true, errorMessage = null) }
             runCatching { getAccounts() }
                 .onSuccess { accounts ->
-                    _uiState.value = accounts.toAccountsUiState(moneyFormatter)
+                    reduce { accounts.toAccountsUiState(moneyFormatter) }
                 }
                 .onFailure { error ->
-                    _uiState.update {
-                        it.copy(
+                    reduce {
+                        copy(
                             isLoading = false,
                             errorMessage = error.message ?: "Hesaplar yuklenemedi.",
                         )

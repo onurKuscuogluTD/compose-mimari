@@ -8,6 +8,12 @@ import com.example.bankingmigration.domain.model.TransferRecipient
 import com.example.bankingmigration.domain.model.TransferRequest
 import com.example.bankingmigration.domain.model.UserProfile
 import com.example.bankingmigration.domain.repository.BankingRepository
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 
 fun sampleDashboard(): BankingDashboard =
     BankingDashboard(
@@ -41,6 +47,12 @@ fun sampleDashboard(): BankingDashboard =
                 iban = "TR44 0001 0000 0000 0000 1001",
                 bankName = "Ornek Bank",
             ),
+            TransferRecipient(
+                id = "rec-002",
+                displayName = "Mehmet Kaya",
+                iban = "TR44 0001 0000 0000 0000 1002",
+                bankName = "Dijital Bank",
+            ),
         ),
         suggestedActions = listOf(
             SuggestedAction(
@@ -58,13 +70,28 @@ class FakeBankingRepository(
         statusMessage = "Transfer talebi alindi. Referans: BNK-123456",
     ),
 ) : BankingRepository {
+    var getDashboardCallCount: Int = 0
+        private set
+
     var lastTransferRequest: TransferRequest? = null
         private set
 
-    override suspend fun getDashboard(): BankingDashboard = dashboard
+    override suspend fun getDashboard(): BankingDashboard {
+        getDashboardCallCount += 1
+        return dashboard
+    }
 
     override suspend fun submitTransfer(request: TransferRequest): TransferReceipt {
         lastTransferRequest = request
         return transferReceipt
     }
+}
+
+@OptIn(ExperimentalCoroutinesApi::class)
+fun <T> TestScope.collectFlowValues(flow: Flow<T>): MutableList<T> {
+    val values = mutableListOf<T>()
+    backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+        flow.toList(values)
+    }
+    return values
 }

@@ -32,7 +32,7 @@ class BankingUseCaseTest {
         val result = GetTransferInitialDataUseCase(repository)()
 
         assertEquals(2, result.accounts.size)
-        assertEquals(1, result.recentRecipients.size)
+        assertEquals(2, result.recentRecipients.size)
     }
 
     @Test

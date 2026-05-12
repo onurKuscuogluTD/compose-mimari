@@ -1,5 +1,7 @@
 package com.example.bankingmigration.presentation.home
 
+import com.example.bankingmigration.core.mvi.MviState
+
 data class HomeUiState(
     val isLoading: Boolean = true,
     val userName: String = "",
@@ -8,7 +10,7 @@ data class HomeUiState(
     val accountCountText: String = "",
     val suggestedActions: List<HomeSuggestedActionUiModel> = emptyList(),
     val errorMessage: String? = null,
-)
+) : MviState
 
 data class HomeSuggestedActionUiModel(
     val id: String,

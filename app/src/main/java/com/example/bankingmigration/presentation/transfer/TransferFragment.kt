@@ -27,11 +27,12 @@ class TransferFragment : BaseViewBindingFragment<FragmentTransferBinding>(
         super.onViewCreated(view, savedInstanceState)
         withBinding {
             backButton.setOnClickListener {
-                findNavController().navigateUp()
+                viewModel.onIntent(TransferIntent.BackClicked)
             }
         }
         setupComposeSections()
         collectXmlState()
+        collectEffects()
     }
 
     private fun setupComposeSections() {
@@ -44,7 +45,9 @@ class TransferFragment : BaseViewBindingFragment<FragmentTransferBinding>(
                         SourceAccountSection(
                             accounts = uiState.accounts,
                             isLoading = uiState.isLoading,
-                            onAccountSelected = viewModel::selectAccount,
+                            onAccountSelected = { accountId ->
+                                viewModel.onIntent(TransferIntent.AccountSelected(accountId))
+                            },
                         )
                     }
                 }
@@ -58,7 +61,9 @@ class TransferFragment : BaseViewBindingFragment<FragmentTransferBinding>(
                         RecentRecipientsSection(
                             recipients = uiState.recipients,
                             isLoading = uiState.isLoading,
-                            onRecipientSelected = viewModel::selectRecipient,
+                            onRecipientSelected = { recipientId ->
+                                viewModel.onIntent(TransferIntent.RecipientSelected(recipientId))
+                            },
                         )
                     }
                 }
@@ -71,9 +76,25 @@ class TransferFragment : BaseViewBindingFragment<FragmentTransferBinding>(
                         val uiState by viewModel.uiState.collectAsStateWithLifecycle()
                         TransferSummarySection(
                             uiState = uiState,
-                            onSubmitClick = viewModel::submit,
-                            onRetryClick = viewModel::retry,
+                            onSubmitClick = {
+                                viewModel.onIntent(TransferIntent.SubmitClicked)
+                            },
+                            onRetryClick = {
+                                viewModel.onIntent(TransferIntent.RetryClicked)
+                            },
                         )
+                    }
+                }
+            }
+        }
+    }
+
+    private fun collectEffects() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.effect.collect { effect ->
+                    when (effect) {
+                        TransferEffect.NavigateBack -> findNavController().navigateUp()
                     }
                 }
             }

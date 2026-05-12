@@ -25,19 +25,37 @@ class HomeFragment : BaseViewBindingFragment<FragmentHomeBinding>(
         super.onViewCreated(view, savedInstanceState)
         withBinding {
             accountsButton.setOnClickListener {
-                findNavController().navigate(R.id.action_homeFragment_to_accountsFragment)
+                viewModel.onIntent(HomeIntent.AccountsClicked)
             }
             transferButton.setOnClickListener {
-                findNavController().navigate(R.id.action_homeFragment_to_transferFragment)
+                viewModel.onIntent(HomeIntent.TransferClicked)
             }
         }
         collectUiState()
+        collectEffects()
     }
 
     private fun collectUiState() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.uiState.collect(::render)
+            }
+        }
+    }
+
+    private fun collectEffects() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.effect.collect { effect ->
+                    when (effect) {
+                        HomeEffect.NavigateToAccounts -> {
+                            findNavController().navigate(R.id.action_homeFragment_to_accountsFragment)
+                        }
+                        HomeEffect.NavigateToTransfer -> {
+                            findNavController().navigate(R.id.action_homeFragment_to_transferFragment)
+                        }
+                    }
+                }
             }
         }
     }
