@@ -1,0 +1,65 @@
+{
+  "user": {
+    "id": "user-001",
+    "name": "Onur Kuscuoglu",
+    "segment": "Premium"
+  },
+  "accounts": [
+    {
+      "id": "acc-try-main",
+      "name": "Vadesiz TL Hesabi",
+      "iban": "TR12 0001 0000 0000 0000 0001",
+      "currency": "TRY",
+      "balanceCents": 12543075,
+      "type": "Current"
+    },
+    {
+      "id": "acc-usd-saving",
+      "name": "Birikim USD Hesabi",
+      "iban": "TR12 0001 0000 0000 0000 0002",
+      "currency": "USD",
+      "balanceCents": 842050,
+      "type": "Savings"
+    },
+    {
+      "id": "acc-eur-travel",
+      "name": "Seyahat EUR Hesabi",
+      "iban": "TR12 0001 0000 0000 0000 0003",
+      "currency": "EUR",
+      "balanceCents": 391220,
+      "type": "Travel"
+    }
+  ],
+  "recentRecipients": [
+    {
+      "id": "rec-001",
+      "displayName": "Ayse Demir",
+      "iban": "TR44 0001 0000 0000 0000 1001",
+      "bankName": "Ornek Bank"
+    },
+    {
+      "id": "rec-002",
+      "displayName": "Mehmet Kaya",
+      "iban": "TR44 0001 0000 0000 0000 1002",
+      "bankName": "Dijital Bank"
+    },
+    {
+      "id": "rec-003",
+      "displayName": "Atlas Teknoloji A.S.",
+      "iban": "TR44 0001 0000 0000 0000 1003",
+      "bankName": "Kurumsal Bank"
+    }
+  ],
+  "suggestedActions": [
+    {
+      "id": "act-001",
+      "title": "Fatura talimatlarini kontrol et",
+      "description": "Yaklasan otomatik odemelerini incele."
+    },
+    {
+      "id": "act-002",
+      "title": "Birikim hedefini guncelle",
+      "description": "Aylik birikim planini yeniden duzenle."
+    }
+  ]
+}

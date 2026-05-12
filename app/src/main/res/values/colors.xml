@@ -1,0 +1,7 @@
+<resources>
+    <color name="screen_background">#F6F8FB</color>
+    <color name="surface">#FFFFFF</color>
+    <color name="text_primary">#172033</color>
+    <color name="text_secondary">#607086</color>
+    <color name="brand">#2563EB</color>
+</resources>
