@@ -11,7 +11,7 @@ import dagger.hilt.android.AndroidEntryPoint
 class AccountsFragment : BaseComposeFragment() {
 
     @Composable
-    override fun Content() {
+    override fun ComposeContent() {
         BankingTheme {
             AccountsRoute(
                 onBackClick = { findNavController().popBackStack() },

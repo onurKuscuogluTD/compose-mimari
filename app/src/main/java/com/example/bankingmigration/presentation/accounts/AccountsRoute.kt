@@ -1,10 +1,10 @@
 package com.example.bankingmigration.presentation.accounts
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.bankingmigration.core.mvi.CollectEffectWithLifecycle
 
 @Composable
 fun AccountsRoute(
@@ -14,12 +14,10 @@ fun AccountsRoute(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    LaunchedEffect(viewModel) {
-        viewModel.effect.collect { effect ->
-            when (effect) {
-                AccountsEffect.NavigateBack -> onBackClick()
-                AccountsEffect.NavigateToTransfer -> onTransferClick()
-            }
+    CollectEffectWithLifecycle(viewModel.effect) { effect ->
+        when (effect) {
+            AccountsEffect.NavigateBack -> onBackClick()
+            AccountsEffect.NavigateToTransfer -> onTransferClick()
         }
     }
 

@@ -130,7 +130,7 @@ flowchart TD
     VM -->|"reducer"| State
     VM --> Effect
     Route -->|"collectAsStateWithLifecycle"| State
-    Route -->|"collect effect"| Effect
+    Route -->|"CollectEffectWithLifecycle"| Effect
     Route --> Screen
     State --> Screen
     Screen -->|"onBackClick / onTransferClick"| Route
@@ -138,7 +138,7 @@ flowchart TD
     Fragment --> Nav
 ```
 
-`AccountsFragment` ekranın tamamının Compose'a taşındığı senaryoyu gösterir. Fragment burada UI sahibi değildir; container, lifecycle ve navigation bridge rolündedir. `AccountsRoute`, ViewModel alma, lifecycle-aware state collection, callback'leri `AccountsIntent`'e çevirme ve `AccountsEffect` toplama sınırıdır. `AccountsScreen` yalnızca `uiState + callbacks` alır; ViewModel, Fragment veya NavController bilmez.
+`AccountsFragment` ekranın tamamının Compose'a taşındığı senaryoyu gösterir. Fragment burada UI sahibi değildir; container, lifecycle ve navigation bridge rolündedir. `AccountsRoute`, ViewModel alma, lifecycle-aware state/effect collection, callback'leri `AccountsIntent`'e çevirme ve `AccountsEffect` toplama sınırıdır. `AccountsScreen` yalnızca `uiState + callbacks` alır; ViewModel, Fragment veya NavController bilmez.
 
 `BaseComposeFragment`, full Compose Fragment host'larda aynı lifecycle stratejisinin tekrar tekrar yazılmasını engeller. Bu sayede feature fragment sadece kendi içeriğini ve navigation callback'lerini tanımlar.
 
@@ -157,7 +157,7 @@ flowchart LR
     subgraph Compose["BaseComposeFragment"]
         CreateCV["onCreateView\nComposeView(requireContext())"]
         Strategy["DisposeOnViewTreeLifecycleDestroyed"]
-        Content["setContent { Content() }"]
+        Content["setContent { ComposeContent() }"]
         CreateCV --> Strategy --> Content
     end
 ```
@@ -214,4 +214,5 @@ Bu ayrım özellikle mixed XML + Compose ekranlarda önemlidir. XML view ve Comp
 - Compose `Screen` veya section fonksiyonları `Fragment`, `NavController`, `Repository` veya XML binding bilmemeli.
 - UI event'leri feature-specific public ViewModel metotları yerine `onIntent(...)` ile gönderilmeli.
 - Navigation event'leri state'e yazılmamalı; `Effect` olarak Fragment/Route tarafından tüketilmeli.
+- Compose Route tarafında effect collection lifecycle-aware olmalı.
 - XML + Compose karma ekranda state owner tek olmalı: ViewModel.

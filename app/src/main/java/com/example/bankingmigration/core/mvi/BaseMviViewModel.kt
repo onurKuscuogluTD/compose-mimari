@@ -1,6 +1,7 @@
 package com.example.bankingmigration.core.mvi
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -8,6 +9,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
 abstract class BaseMviViewModel<I : MviIntent, S : MviState, E : MviEffect>(
     initialState: S,
@@ -31,6 +33,8 @@ abstract class BaseMviViewModel<I : MviIntent, S : MviState, E : MviEffect>(
     }
 
     protected fun emitEffect(effect: E) {
-        _effect.tryEmit(effect)
+        viewModelScope.launch {
+            _effect.emit(effect)
+        }
     }
 }

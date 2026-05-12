@@ -21,10 +21,10 @@ abstract class BaseComposeFragment : Fragment() {
                 ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed,
             )
             setContent {
-                Content()
+                ComposeContent()
             }
         }
 
     @Composable
-    protected abstract fun Content()
+    protected abstract fun ComposeContent()
 }
